@@ -1,22 +1,22 @@
 # Snoopy updates
 
-Public program-only updates for existing Snoopy Windows and Snoopy Displays installations. No GitHub sign-in or token is required.
+Public updates for existing Snoopy Windows and Snoopy Displays installations. No GitHub sign-in or token is required.
 
-## Current versions
+## Current release
 
-- Snoopy Windows **1.3.0**
-- Snoopy Displays **1.2.0**
+- Snoopy Windows **1.5.1**
+- Snoopy Displays **1.4.1**
 
-Both include Repeat, Span (Fit/Fill), and Rotate screens every 30 minutes. Rotate shows animation and clock on one selected monitor, keeps the others black, then moves playback to the next. Every new screensaver session starts on the primary selected display. Spanning and rotation use one video player. Existing settings, time zone, weather and animations are preserved. Repeat remains the default.
+Includes all 39 idle houses and objects, four resting poses, 84 palettes, and weather effects. Calendar and time-of-day selection follows the chosen time zone; weather uses a fresh matching location. Repeat, spanning, 30-minute screen rotation, travel settings and original animations remain available.
 
 ## Update an existing PC
 
-Open Snoopy settings > Check for an update > Update now. Keep old skips that version's notifications; a manual check can offer it again. Daily checks can be disabled.
+Open Snoopy settings > Check for an update > Update now. The small program package starts an updated helper, which downloads and verifies the required idle media before installing. The one-time media download is about **1.1 GB**. Cancel keeps the old installation. Settings, original Videos, Windows resolution and screensaver registration are preserved. No administrator elevation is requested; company app or network policies can still block the update.
 
-If the old app has no updater, open [Releases](https://github.com/iliamch/snoopy-updates/releases/latest), download the matching **UpdaterSetup** ZIP, extract all files and run **InstallUpdate.exe** once. Select the existing Snoopy folder if asked. Program-only ZIPs do not include animation media and are not full fresh installations.
+If the old app has no updater button, open [Releases](https://github.com/iliamch/snoopy-updates/releases/latest), download the matching **UpdaterSetup** ZIP, extract it and run **InstallUpdate.exe**. Select the existing Snoopy folder if asked. These small ZIPs update an existing installation; they are not fresh installers.
 
-Full installers and source remain in the original private repositories. This public feed never includes animation media, personal settings or credentials.
+The shared `SnoopyIdleAssets-1.zip` is downloaded automatically. Do not unpack it manually. This public release contains the shared idle media pack and program updates, but no personal settings or credentials. Application source remains in the original repositories.
 
 ## Publish future updates
 
-Increase the edition's version, build it, and attach its generated `SnoopyUpdate-VERSION.zip` or `SnoopyDisplaysUpdate-VERSION.zip` to a published stable release here. Both editions can share a release. The updater selects the highest matching version among the latest 100 releases, verifies GitHub SHA-256 and individual payload hashes, and rejects wrong-edition packages and downgrades. A source commit alone does not publish an installable update.
+Publish the generated `SnoopyUpdate-VERSION.zip` and/or `SnoopyDisplaysUpdate-VERSION.zip` to a stable release. Keep the pinned media pack available in a stable release among the newest 100 releases. Changing media requires updating both package and manifest digests in MediaUpdate.cs. The updater validates GitHub digests, the pinned media hash, file hashes and package paths, and rejects wrong editions and downgrades. A source commit alone does not publish an installable update.
