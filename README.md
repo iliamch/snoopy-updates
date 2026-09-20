@@ -4,8 +4,10 @@ Public updates for existing Snoopy Windows and Snoopy Displays installations. No
 
 ## Current release
 
-- Snoopy Windows **1.5.3**
-- Snoopy Displays **1.4.3**
+- Snoopy Windows **1.5.4**
+- Snoopy Displays **1.4.4**
+
+Multi-monitor playback keeps inactive screens powered with black pixels. Rotation moves the animation inside a stationary desktop window. Videos load paused and start from zero when ready; doghouse timing begins after artwork loading.
 
 Rotation accepts 1–90 whole minutes and waits until a video or doghouse section ends. Doghouse sections accept 1–90 minutes (default 5): the house stays fixed while Snoopy changes pose, followed by one regular animation before another doghouse. Date/time display is optional. Existing travel time zone, weather, calendar, 39 idle houses, original animations, Repeat and Span remain available.
 
