@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Snoopy
+Comment=Snoopy animations, weather and doghouse scenes
+Exec=snoopy-linux
+Icon=video-display
+Terminal=false
+Categories=Utility;
+StartupNotify=true

@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+data_root="${XDG_DATA_HOME:-$HOME/.local/share}/SnoopyLinux"
+if [ -f "$data_root/current/main.py" ]; then
+    exec /usr/bin/python3 "$data_root/current/main.py" "$@"
+fi
+exec /usr/bin/python3 /usr/share/snoopy-linux/main.py "$@"

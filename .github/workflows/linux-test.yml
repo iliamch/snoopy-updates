@@ -1,0 +1,43 @@
+name: Linux installer and playback
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ubuntu:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    env:
+      XDG_CONFIG_HOME: ${{ runner.temp }}/snoopy-config
+      XDG_DATA_HOME: ${{ runner.temp }}/snoopy-data
+      XDG_CACHE_HOME: ${{ runner.temp }}/snoopy-cache
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install published application and complete media
+        run: python3 linux/online_install.py
+      - name: Rules, update integrity and installer checks
+        working-directory: linux
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Native cloudy playback
+        run: snoopy-linux --smoke 8 --doghouse --weather cloudy --report cloud-test.json
+      - name: Native movie playback
+        run: snoopy-linux --smoke 8 --report movie-test.json
+      - name: Native doghouse to movie to doghouse transition
+        run: /usr/bin/python3 linux/tests/playback_check.py "$XDG_DATA_HOME/SnoopyLinux/Media-1" transitions.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-test-${{ matrix.runner }}
+          path: |
+            cloud-test.json
+            movie-test.json
+            transitions.json

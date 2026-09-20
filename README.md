@@ -4,8 +4,8 @@ Public updates for existing Snoopy Windows and Snoopy Displays installations. No
 
 ## Current release
 
-- Snoopy Windows **1.5.4**
-- Snoopy Displays **1.4.4**
+- Snoopy Windows **1.5.5**
+- Snoopy Displays **1.4.5**
 
 Multi-monitor playback keeps inactive screens powered with black pixels. Rotation moves the animation inside a stationary desktop window. Videos load paused and start from zero when ready; doghouse timing begins after artwork loading.
 
@@ -22,3 +22,18 @@ Missing idle media is downloaded and verified automatically from the existing Sn
 ## Publish future updates
 
 Publish the edition's generated update and UpdaterSetup ZIPs to a stable release. Keep the pinned media pack available among the newest 100 releases. The updater validates GitHub digests, pinned media hashes, package paths and payload hashes, and rejects wrong editions and downgrades. A source commit alone does not publish an installable update.
+
+## Ubuntu and Debian Linux
+
+Snoopy Linux **1.0.0** is an initial Linux build for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
+
+Run as your normal desktop user:
+
+```bash
+sudo apt-get update && sudo apt-get install -y curl
+curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux.sh -o install-snoopy-linux.sh && bash install-snoopy-linux.sh
+```
+
+The installer downloads about 2 GB, verifies the application and media, installs native dependencies, adds the Snoopy menu entry and configures the animation folder automatically. Allow 5 GB free during installation. Open `snoopy-linux` afterward. Automatic idle startup is optional in Settings; the desktop lock stays unchanged. See [Linux instructions and desktop compatibility](linux/README.md).
+
+The cloud fix skips damaged opening frames and fades in clean cloud artwork on both platforms. Linux automatic startup, GeoClue permissions and physical multi-monitor behavior depend on the desktop. Native Ubuntu CI checks are attached to this repository for amd64 and arm64.
