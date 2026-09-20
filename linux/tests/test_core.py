@@ -48,10 +48,10 @@ class PolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError):media_file(root,"../outside")
 
 class UpdateTests(unittest.TestCase):
-    def offer(self):return dict(draft=False,prerelease=False,assets=[dict(name="SnoopyLinuxUpdate-1.0.1.tar.gz",state="uploaded",size=100,digest="sha256:"+"a"*64,url=updater.API+"/releases/assets/1")])
+    def offer(self):return dict(draft=False,prerelease=False,assets=[dict(name="SnoopyLinuxUpdate-1.0.2.tar.gz",state="uploaded",size=100,digest="sha256:"+"a"*64,url=updater.API+"/releases/assets/1")])
     def test_select(self):
-        self.assertEqual(updater.select([self.offer()])["version"],"1.0.1")
-        self.assertIsNone(updater.select([self.offer()],"1.0.1"))
+        self.assertEqual(updater.select([self.offer()])["version"],"1.0.2")
+        self.assertIsNone(updater.select([self.offer()],"1.0.2"))
         self.assertIsNone(updater.select([dict(self.offer(),prerelease=True)]))
     def test_wrong_platform(self):
         release=self.offer();release["assets"][0]["name"]="SnoopyUpdate-99.0.0.zip"

@@ -9,9 +9,17 @@ from pathlib import Path
 from snoopy import VERSION
 
 ROOT=Path(__file__).resolve().parent
-def tar_bytes(files):
+def tar_bytes(files, directories=False):
     stream=io.BytesIO()
     with tarfile.open(fileobj=stream,mode="w",format=tarfile.USTAR_FORMAT) as tar:
+        if directories:
+            parents=set()
+            for name,_,_ in files:
+                parts=name.split('/')[:-1]
+                for depth in range(1,len(parts)+1):parents.add('/'.join(parts[:depth]))
+            for name in sorted(parents,key=lambda x:(x.count('/'),x)):
+                info=tarfile.TarInfo(name+'/');info.type=tarfile.DIRTYPE;info.mode=0o755;info.uid=info.gid=0;info.mtime=0
+                tar.addfile(info)
         for name,payload,mode in files:
             info=tarfile.TarInfo(name);info.size=len(payload);info.mode=mode;info.uid=info.gid=0;info.mtime=0
             tar.addfile(info,io.BytesIO(payload))
@@ -39,7 +47,7 @@ def build(out):
     control=(f"Package: snoopy-linux\nVersion: {VERSION}\nSection: x11\nPriority: optional\nArchitecture: all\nMaintainer: Snoopy local build <noreply@localhost>\nDepends: {dependencies}\nDescription: Snoopy animations and contextual doghouse scenes\n Shared Python/Qt implementation for Ubuntu and Debian on amd64 and arm64.\n Preview and fullscreen playback, weather, travel time zones and display modes.\n Does not replace or disable the desktop lock screen. Media installed separately.\n").encode()
     data=[("usr/share/snoopy-linux/"+name,payload,mode) for name,payload,mode in app]
     data += [("usr/bin/snoopy-linux",(ROOT/"snoopy-linux").read_bytes(),0o755),("usr/share/applications/snoopy-linux.desktop",(ROOT/"snoopy-linux.desktop").read_bytes(),0o644),("usr/share/doc/snoopy-linux/README.md",(ROOT/"README.md").read_bytes(),0o644)]
-    ar_write(out/("snoopy-linux_"+VERSION+"_all.deb"),[("debian-binary",b"2.0\n"),("control.tar.gz",tar_bytes([("control",control,0o644)])),("data.tar.gz",tar_bytes(data))])
+    ar_write(out/("snoopy-linux_"+VERSION+"_all.deb"),[("debian-binary",b"2.0\n"),("control.tar.gz",tar_bytes([("control",control,0o644)])),("data.tar.gz",tar_bytes(data,directories=True))])
     for path in sorted(out.iterdir()):
         if path.suffix in (".deb",".gz"):print(path.name,path.stat().st_size)
 

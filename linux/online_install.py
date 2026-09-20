@@ -13,8 +13,8 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/"
-APP_NAME = "snoopy-linux_1.0.0_all.deb"
-APP_SHA = "1452f1116ea33b5a9e7be8830c4c2c8b7a058736cfe27bc4fa2b43ec8135a468"
+APP_NAME = "snoopy-linux_1.0.1_all.deb"
+APP_SHA = "0269962e44cb7fcab490503e5a812998ca6092b51a39580c62fe94346d856276"
 MEDIA_NAME = "SnoopyLinux-Media-1.zip"
 MEDIA_SHA = "40f1c7c6d6ed61ed72afa934f85530a0605ecf605f8d9ceb594953caee5fa33f"
 
@@ -26,7 +26,7 @@ def download(name, expected, cache):
     if target.is_file() and digest(target)==expected:return target
     partial=cache/(name+".part")
     if not partial.is_file() or digest(partial)!=expected:
-        print("Downloading "+name+"Ã¢â‚¬Â¦",flush=True)
+        print("Downloading "+name+"...",flush=True)
         subprocess.run(["curl","--fail","--location","--retry","3","--continue-at","-","--output",str(partial),RELEASE+name],check=True)
     if digest(partial)!=expected:
         partial.unlink()
@@ -37,7 +37,7 @@ def download(name, expected, cache):
 def extract_media(archive, root):
     root=Path(root);target=root/"Media-1"
     if (target/"installed-archive.sha256").is_file() and (target/"installed-archive.sha256").read_text().strip()==MEDIA_SHA and (target/"scenes.json").is_file():return target
-    print("Extracting and checking the animation libraryÃ¢â‚¬Â¦",flush=True)
+    print("Extracting and checking the animation library...",flush=True)
     with tempfile.TemporaryDirectory(prefix="media-install-",dir=root) as temp:
         stage=Path(temp)
         with zipfile.ZipFile(archive) as package:
@@ -95,7 +95,7 @@ def main():
     archive.unlink()  # The verified extracted library is now installed; save 2 GB of cache space.
     print("Snoopy installed. Open Snoopy from the applications menu, or type: snoopy-linux",flush=True)
     print("Animations are configured automatically. Automatic idle startup is optional in Settings. Your screen lock is unchanged.",flush=True)
-    print("Linux 1.0.0 is an initial test build; try Preview on this desktop first.",flush=True)
+    print("Linux 1.0.1 is an initial test build; try Preview on this desktop first.",flush=True)
 
 if __name__=="__main__":
     try:main()

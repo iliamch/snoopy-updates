@@ -25,13 +25,13 @@ Publish the edition's generated update and UpdaterSetup ZIPs to a stable release
 
 ## Ubuntu and Debian Linux
 
-Snoopy Linux **1.0.0** is an initial Linux build for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
+Snoopy Linux **1.0.1** is an initial Linux build for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
 
 Run as your normal desktop user:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl
-curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux.sh -o install-snoopy-linux.sh && bash install-snoopy-linux.sh
+curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux-1.0.1.sh -o install-snoopy-linux-1.0.1.sh && bash install-snoopy-linux-1.0.1.sh
 ```
 
 The installer downloads about 2 GB, verifies the application and media, installs native dependencies, adds the Snoopy menu entry and configures the animation folder automatically. Allow 5 GB free during installation. Open `snoopy-linux` afterward. Automatic idle startup is optional in Settings; the desktop lock stays unchanged. See [Linux instructions and desktop compatibility](linux/README.md).

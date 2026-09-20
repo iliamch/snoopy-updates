@@ -1,4 +1,4 @@
-# Snoopy for Ubuntu and Debian — 1.0.0 initial Linux build
+# Snoopy for Ubuntu and Debian — 1.0.1 initial Linux build
 
 For Ubuntu 24.04 or newer and Debian 12 or newer, with Python 3.11+ and Qt 6.4+.
 The same **all** package runs on Intel/AMD 64-bit and ARM64. Native Qt and video libraries are installed from your distribution for your processor. No Windows emulator is used.
@@ -9,18 +9,18 @@ Run these commands as your normal desktop user (the installer requests sudo for 
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl
-curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux.sh -o install-snoopy-linux.sh && bash install-snoopy-linux.sh
+curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux-1.0.1.sh -o install-snoopy-linux-1.0.1.sh && bash install-snoopy-linux-1.0.1.sh
 ```
 
 This downloads about 2 GB of animations, verifies SHA-256 checksums and each extracted media file, installs the correct native dependencies, and configures the media folder automatically. Allow at least 5 GB free during installation. It creates the Snoopy applications-menu entry; run `snoopy-linux` to open settings. Automatic idle playback remains an optional setting. It preserves other Snoopy preferences and the desktop lock configuration.
 
 ## Manual install
 
-1. Copy `snoopy-linux_1.0.0_all.deb` and `SnoopyLinux-Media-1.zip` to Linux.
-2. In a terminal in that folder, run `sudo apt install ./snoopy-linux_1.0.0_all.deb`.
+1. Copy `snoopy-linux_1.0.1_all.deb` and `SnoopyLinux-Media-1.zip` to Linux.
+2. In a terminal in that folder, run `sudo apt install ./snoopy-linux_1.0.1_all.deb`.
 3. Extract `SnoopyLinux-Media-1.zip` to a permanent folder. Open **Snoopy** from the applications menu. Choose its **Media** folder (containing Videos, IdleAssets and scenes.json), then Save settings and Preview.
 
-An alternative per-user installer is included in `SnoopyLinux-1.0.0.tar.gz`: extract it, install the dependencies below, then run `sh install.sh` without sudo. Application updates after installation do not require administrator access.
+An alternative per-user installer is included in `SnoopyLinux-1.0.1.tar.gz`: extract it, install the dependencies below, then run `sh install.sh` without sudo. Application updates after installation do not require administrator access.
 
 Dependencies: `python3-pyqt6 python3-pyqt6.qtmultimedia python3-lunardate qt6-wayland gstreamer1.0-libav gstreamer1.0-plugins-good gstreamer1.0-plugins-bad libxss1 libglib2.0-bin libnotify-bin`. On Ubuntu these are in the normal distribution repositories, including Universe. Older Ubuntu releases are not supported by this package.
 
