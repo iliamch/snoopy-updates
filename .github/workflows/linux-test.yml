@@ -1,5 +1,7 @@
 name: Linux installer and playback
 on:
+  push:
+    paths: ['linux/**', '.github/workflows/linux-test.yml']
   release:
     types: [published]
   workflow_dispatch:
@@ -14,14 +16,16 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     env:
-      XDG_CONFIG_HOME: ${{ runner.temp }}/snoopy-config
-      XDG_DATA_HOME: ${{ runner.temp }}/snoopy-data
-      XDG_CACHE_HOME: ${{ runner.temp }}/snoopy-cache
       QT_QPA_PLATFORM: offscreen
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Set isolated test directories
+        run: |
+          echo "XDG_CONFIG_HOME=$RUNNER_TEMP/snoopy-config" >> "$GITHUB_ENV"
+          echo "XDG_DATA_HOME=$RUNNER_TEMP/snoopy-data" >> "$GITHUB_ENV"
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/snoopy-cache" >> "$GITHUB_ENV"
       - name: Install published application and complete media
         run: python3 linux/online_install.py
       - name: Rules, update integrity and installer checks
