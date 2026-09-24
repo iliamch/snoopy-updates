@@ -7,7 +7,7 @@ URL='https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24/Sno
 SHA='5b85da61f339712f7684f3f988641013aebaf84939b71cab225fdbc8f748b5e5'
 SIZE=2189200473
 PARTS=[{'name': 'SnoopyIdleAssets-2.zip.001', 'size': 1100000000, 'sha256': '852d8d9fd316b04603d9fac3a5cdcee6906c33e4a48597c8d88a2d641cd9eb2e'}, {'name': 'SnoopyIdleAssets-2.zip.002', 'size': 1089200473, 'sha256': '0c8d1265ec04790051a7c82be948c5f5389d5be53e644216caf3c626e08233fa'}]
-MANIFEST_SHA='5b85da61f339712f7684f3f988641013aebaf84939b71cab225fdbc8f748b5e5'
+MANIFEST_SHA='5856484b9387f562acad06013aa3223921322c1f3ef405fc3ebb3e34679fa04e'
 
 def digest(path):
     with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()

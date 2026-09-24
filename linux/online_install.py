@@ -15,10 +15,10 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
-RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24/"
+RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24.1/"
 BASE_RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/"
-APP_NAME = "snoopy-linux_1.1.0_all.deb"
-APP_SHA = "c149a46b50429512f9baf3c02b0031e12b89a22df9d9c150d723f833889242ba"
+APP_NAME = "snoopy-linux_1.1.1_all.deb"
+APP_SHA = "4be5b9c82cc4e65cf0247c876a1de1b20567d0d47faa2c32fdef44614d695b27"
 MEDIA_NAME = "SnoopyLinux-Media-1.zip"
 MEDIA_SHA = "40f1c7c6d6ed61ed72afa934f85530a0605ecf605f8d9ceb594953caee5fa33f"
 
@@ -125,4 +125,3 @@ def main():
 if __name__=="__main__":
     try:main()
     except (OSError,ValueError,RuntimeError,subprocess.CalledProcessError) as error:raise SystemExit("Installation stopped: "+str(error))
-

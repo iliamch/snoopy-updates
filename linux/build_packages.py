@@ -5,6 +5,7 @@ import gzip
 import io
 import json
 import tarfile
+import zipfile
 from pathlib import Path
 from snoopy import VERSION
 
@@ -52,4 +53,12 @@ def build(out):
         if path.suffix in (".deb",".gz"):print(path.name,path.stat().st_size)
 
 if __name__=="__main__":
-    parser=argparse.ArgumentParser();parser.add_argument("output",type=Path);build(parser.parse_args().output)
+    parser=argparse.ArgumentParser();parser.add_argument("output",type=Path)
+    parser.add_argument("--idle-media",type=Path,help="Validate release pins against the real media archive before building")
+    args=parser.parse_args()
+    if args.idle_media:
+        from snoopy import media_update
+        if args.idle_media.stat().st_size!=media_update.SIZE or media_update.digest(args.idle_media)!=media_update.SHA:raise ValueError("Release media archive pin mismatch")
+        with zipfile.ZipFile(args.idle_media) as archive:
+            if hashlib.sha256(archive.read("package-manifest.json")).hexdigest()!=media_update.MANIFEST_SHA:raise ValueError("Release media manifest pin mismatch")
+    build(args.output)
