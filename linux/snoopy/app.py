@@ -15,7 +15,7 @@ from . import VERSION
 from .core import load_settings,save_settings,Library,data_root,config_root
 from .player import Engine,Job
 from .services import geocode,idle_seconds,locked
-from . import updater
+from . import updater, media_update
 
 def autostart(enabled):
     folder=Path(os.environ.get("XDG_CONFIG_HOME",Path.home()/".config"))/"autostart"
@@ -30,7 +30,7 @@ def autostart(enabled):
 
 class SettingsWindow(QMainWindow):
     def __init__(self):
-        super().__init__();self.settings=load_settings();self.jobs=[];self.engines=[];self.offer=None
+        super().__init__();self.settings=load_settings();self.jobs=[];self.engines=[];self.offer=None;self.media_preparing=False
         self.setWindowTitle("Snoopy for Linux "+VERSION);self.resize(850,800)
         scroll=QScrollArea();scroll.setWidgetResizable(True);self.setCentralWidget(scroll)
         body=QWidget();scroll.setWidget(body);layout=QVBoxLayout(body);form=QFormLayout();layout.addLayout(form)
@@ -83,6 +83,8 @@ class SettingsWindow(QMainWindow):
         self.status=QLabel("Ready. Automatic launch depends on your desktop's idle interface. Your existing screen lock remains in control.");self.status.setWordWrap(True);layout.addWidget(self.status)
         if self.settings["AutomaticUpdates"] and time.time()-self.settings.get("LastUpdateCheck",0)>86400:QTimer.singleShot(800,lambda:self.check_update(True))
 
+        QTimer.singleShot(1000,self.prepare_media)
+
     @staticmethod
     def minutes(value):
         box=QSpinBox();box.setRange(1,90);box.setSingleStep(1);box.setValue(value);return box
@@ -125,6 +127,8 @@ class SettingsWindow(QMainWindow):
             return True
         except Exception as error:self.status.setText(str(error));return False
     def play(self,preview,doghouse=False,forced=None):
+        if self.media_preparing:
+            self.status.setText("Please wait for the new animations to finish installing.");return
         if not self.save():return
         try:
             library=Library(self.settings["MediaPath"])
@@ -146,6 +150,16 @@ class SettingsWindow(QMainWindow):
         if self.offer:
             self.settings["SkippedVersion"]=self.offer["version"];save_settings(self.settings)
             self.update_button.setEnabled(False);self.keep_button.setEnabled(False);self.status.setText("Keeping the current version. You can check manually later.")
+    def prepare_media(self):
+        if not self.settings["MediaPath"] or media_update.complete(self.settings["MediaPath"]):return
+        self.media_preparing=True
+        self.check_button.setEnabled(False);self.update_button.setEnabled(False)
+        self.status.setText("Downloading and verifying the new doghouse scenes. Your existing library is kept until this finishes…")
+        def done(result):
+            self.media_preparing=False;self.check_button.setEnabled(True)
+            self.status.setText("New doghouse scenes are ready." if result[0] else "New scenes could not finish downloading. Reopen Settings to retry. "+result[1])
+        self.task(lambda:media_update.ensure(self.settings["MediaPath"]),done)
+
     def install_update(self):
         if not self.offer:return
         self.update_button.setEnabled(False);self.keep_button.setEnabled(False);self.check_button.setEnabled(False)
@@ -209,7 +223,7 @@ def main():
         errors=[];engine.failed.connect(errors.append);engine.done.connect(app.quit);engine.start()
         if args.smoke:QTimer.singleShot(args.smoke*1000,engine.stop)
         app.exec()
-        result=dict(idle_frames=engine.frames,video_frames=engine.video_frames,errors=errors)
+        result=dict(idle_frames=engine.frames,video_frames=engine.video_frames,action_frames=engine.action_frames,visitor_frames=engine.visitor_frames,errors=errors)
         if args.report:Path(args.report).write_text(json.dumps(result,indent=2))
         if args.smoke:return 0 if not errors and (engine.frames if args.doghouse else engine.video_frames)>args.smoke*5 else 1
         return int(bool(errors))

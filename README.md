@@ -4,8 +4,8 @@ Public updates for existing Snoopy Windows and Snoopy Displays installations. No
 
 ## Current release
 
-- Snoopy Windows **1.5.5**
-- Snoopy Displays **1.4.5**
+- Snoopy Windows **1.5.6**
+- Snoopy Displays **1.4.6**
 
 Multi-monitor playback keeps inactive screens powered with black pixels. Rotation moves the animation inside a stationary desktop window. Videos load paused and start from zero when ready; doghouse timing begins after artwork loading.
 
@@ -17,7 +17,7 @@ Open Snoopy settings > Check for an update > Update now. Keep old skips that ver
 
 For manual updating, download the matching **UpdaterSetup** ZIP from [Releases](https://github.com/iliamch/snoopy-updates/releases/latest), extract all files and run **InstallUpdate.exe**. Select the existing Snoopy folder if asked. The smaller SnoopyUpdate / SnoopyDisplaysUpdate ZIPs are intended for the built-in updater. These packages update existing installations; they are not fresh installers.
 
-Missing idle media is downloaded and verified automatically from the existing SnoopyIdleAssets-1.zip in the September 13 release (about 1.1 GB). No new media pack is needed for this version. Cancel keeps the current installation. No personal settings or credentials are included in these packages.
+The new idle media library downloads automatically in two verified parts (about 2.2 GB). Both parts and every extracted file are checked before the program is replaced. Cancel keeps the current installation. No personal settings or credentials are included in these packages.
 
 ## Publish future updates
 
@@ -25,15 +25,21 @@ Publish the edition's generated update and UpdaterSetup ZIPs to a stable release
 
 ## Ubuntu and Debian Linux
 
-Snoopy Linux **1.0.1** is an initial Linux build for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
+Snoopy Linux **1.1.0** supports doghouse interactions for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
 
 Run as your normal desktop user:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl
-curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/install-snoopy-linux-1.0.1.sh -o install-snoopy-linux-1.0.1.sh && bash install-snoopy-linux-1.0.1.sh
+curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24/SnoopyUbuntuInstall.py -o SnoopyUbuntuInstall.py && python3 SnoopyUbuntuInstall.py
 ```
 
-The installer downloads about 2 GB, verifies the application and media, installs native dependencies, adds the Snoopy menu entry and configures the animation folder automatically. Allow 5 GB free during installation. Open `snoopy-linux` afterward. Automatic idle startup is optional in Settings; the desktop lock stays unchanged. See [Linux instructions and desktop compatibility](linux/README.md).
+The installer downloads about 4.2 GB, verifies the application and media, installs native dependencies, adds the Snoopy menu entry and configures the animation folder automatically. Allow 8 GB free during installation. Open `snoopy-linux` afterward. Automatic idle startup is optional in Settings; the desktop lock stays unchanged. See [Linux instructions and desktop compatibility](linux/README.md).
 
 The cloud fix skips damaged opening frames and fades in clean cloud artwork on both platforms. Linux automatic startup, GeoClue permissions and physical multi-monitor behavior depend on the desktop. Native Ubuntu CI checks are attached to this repository for amd64 and arm64.
+
+## Doghouse variety
+
+119 interaction assets include character moments, visitors, pose transitions and four additional generic/environment reactions. A shared event timeline alternates sleep with complete events, returns to sleep between them, and avoids repeats while eligible alternatives remain. Stars, weather and seasonal events keep their original eligibility rules. Two visitors with damaged alpha remain excluded.
+
+Linux 1.0.1 users should reopen Settings after updating; the new media library downloads automatically there. Future updates prepare media before selecting the new application version.

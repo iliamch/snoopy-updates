@@ -7,6 +7,7 @@ from PyQt6.QtMultimedia import QMediaPlayer, QVideoSink
 from .core import Schedule, calendar_tags, now, media_file
 from .render import Renderer, image_rect
 from .services import weather, Location
+from .interactions import Program,moon_tag
 
 class Job(QThread):
     result=pyqtSignal(object)
@@ -70,6 +71,7 @@ class Engine(QObject):
         self.weather_tags=set();self.weather_at=0;self.weather_coordinates=None;self.location=Location()
         self.jobs=[];self.windows=[];self.stopped=False;self.frames=0;self.video_frames=0
         self.video_start_pending=False
+        self.interaction_history=set();self.action_frames=0;self.visitor_frames=0
         screens=QApplication.screens()
         self.screens=[s for s in screens if settings["Displays"].get(s.name(),{}).get("Enabled",True)] or screens[:1]
         if preview:self.screens=self.screens[:1]
@@ -105,6 +107,7 @@ class Engine(QObject):
 
     def tags(self):
         tags=calendar_tags(now(self.settings),(self.settings.get("Latitude") or 0)<0)
+        tags.add(moon_tag())
         if self.settings["Weather"] and time.monotonic()-self.weather_at<5400 and self.weather_coordinates==(self.settings.get("Latitude"),self.settings.get("Longitude")):tags|=self.weather_tags
         return tags
 
@@ -130,6 +133,8 @@ class Engine(QObject):
                 self.media.stop()
                 self.selection=self.library.idle(self.tags(),self.previous,self.forced_weather)
                 self.previous=self.selection["house"]["Id"];self.pose_step=0
+                if self.library.interactions:
+                    self.selection['program']=Program(self.library.interactions,self.selection,self.selection['tags'],self.settings['DoghouseMinutes']*60,used=self.interaction_history)
                 self.renderer.begin(self.selection);self.image=self.renderer.frame(self.selection,0)
                 self.schedule.section=time.monotonic()
             else:
@@ -171,9 +176,14 @@ class Engine(QObject):
                 elapsed=time.monotonic()-self.schedule.section
                 if elapsed>=self.settings["DoghouseMinutes"]*60:self.next_scene();return
                 step=int(elapsed/40)
-                if step!=self.pose_step:
+                if "program" not in self.selection and step!=self.pose_step:
                     self.pose_step=step;self.selection["pose"]=random.choice([p for p in self.library.catalog["Poses"] if p["Id"]!=self.selection["pose"]["Id"]])
-                self.image=self.renderer.frame(self.selection,elapsed);self.frames+=1;self.repaint()
+                self.image=self.renderer.frame(self.selection,elapsed);self.frames+=1
+                if 'program' in self.selection:
+                    character,visitors=self.selection['program'].at(elapsed)
+                    if not character['Pose']:self.action_frames+=1
+                    if visitors:self.visitor_frames+=1
+                self.repaint()
             elif self.mode=="movie" and self.image.isNull() and time.monotonic()-self.loading_at>20:
                 self.failed.emit("The video could not start within 20 seconds. Check the installed media codecs.");self.stop()
         except Exception as e:self.failed.emit(str(e));self.stop()

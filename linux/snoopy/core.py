@@ -122,6 +122,8 @@ class Library:
         self.root = Path(root).resolve()
         self.scenes = json.loads((self.root/"scenes.json").read_text(encoding="utf-8-sig"))
         self.catalog = json.loads((self.root/"IdleAssets/catalog.json").read_text(encoding="utf-8-sig"))
+        interactions=self.root/"IdleAssets/interactions.json"
+        self.interactions=json.loads(interactions.read_text(encoding="utf-8")) if interactions.is_file() else None
         for key in ("Houses","Poses","Effects","Palettes"):
             if not self.catalog.get(key): raise ValueError("Incomplete idle catalog: "+key)
         for scene in self.scenes:
@@ -140,7 +142,7 @@ class Library:
         effects = [a for a in self.catalog["Effects"] if matches(a["Rules"],tags,True)
                    and any(r.startswith("weather:") and r in tags for r in a["Rules"])
                    and not set(a["Rules"])&set(house["ExcludedWeather"])]
-        return dict(house=house,pose=random.choice(poses),palette=random.choice(palettes) if palettes else None,
+        return dict(house=house,pose=random.choice(poses),poses=poses,tags=tags,palette=random.choice(palettes) if palettes else None,
                     effect=random.choice(effects) if effects else None)
 
     def movie(self,tags,previous=None,failed=None):

@@ -1,5 +1,8 @@
 """Download, verify, install and configure a complete Snoopy Linux installation."""
 import hashlib
+import io
+import tarfile
+import importlib.util
 import json
 import os
 import platform
@@ -12,9 +15,10 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
-RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/"
-APP_NAME = "snoopy-linux_1.0.1_all.deb"
-APP_SHA = "0269962e44cb7fcab490503e5a812998ca6092b51a39580c62fe94346d856276"
+RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24/"
+BASE_RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/"
+APP_NAME = "snoopy-linux_1.1.0_all.deb"
+APP_SHA = "343c5fde02eb1c62a0c246118a7c9a2ef84eac0466d71f9e7c1dee27aa1e80a2"
 MEDIA_NAME = "SnoopyLinux-Media-1.zip"
 MEDIA_SHA = "40f1c7c6d6ed61ed72afa934f85530a0605ecf605f8d9ceb594953caee5fa33f"
 
@@ -27,7 +31,7 @@ def download(name, expected, cache):
     partial=cache/(name+".part")
     if not partial.is_file() or digest(partial)!=expected:
         print("Downloading "+name+"...",flush=True)
-        subprocess.run(["curl","--fail","--location","--retry","3","--continue-at","-","--output",str(partial),RELEASE+name],check=True)
+        subprocess.run(["curl","--fail","--location","--retry","3","--continue-at","-","--output",str(partial),(BASE_RELEASE if name==MEDIA_NAME else RELEASE)+name],check=True)
     if digest(partial)!=expected:
         partial.unlink()
         raise RuntimeError("Download checksum mismatch. Please run the installer again.")
@@ -60,6 +64,26 @@ def extract_media(archive, root):
         ready.rename(target)
     return target
 
+def prepare_idle_from_deb(app,media,cache):
+    # The entire .deb is pinned by SHA256 before any contained Python is loaded.
+    payload=Path(app).read_bytes()
+    if digest(app)!=APP_SHA or payload[:8]!=b'!<arch>\n':raise ValueError('Invalid application package')
+    at=8;data=None
+    while at+60<=len(payload):
+        header=payload[at:at+60];size=int(header[48:58]);name=header[:16].decode().strip().rstrip('/')
+        at+=60
+        if name=='data.tar.gz':data=payload[at:at+size]
+        at+=size+(size%2)
+    if data is None:raise ValueError('Application payload missing')
+    with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as package:
+        member=package.getmember('usr/share/snoopy-linux/snoopy/media_update.py')
+        if not member.isfile() or member.size>100000:raise ValueError('Invalid media installer')
+        code=package.extractfile(member).read()
+    helper=cache/'verified_idle_installer.py';helper.write_bytes(code)
+    spec=importlib.util.spec_from_file_location('snoopy_idle_installer',helper)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    module.ensure(media)
+
 def configure(media):
     root=Path(os.environ.get("XDG_CONFIG_HOME",Path.home()/".config"))/"snoopy"
     root.mkdir(parents=True,exist_ok=True);settings=root/"settings.json"
@@ -80,22 +104,23 @@ def main():
     if sys.version_info<(3,11):raise SystemExit("Python 3.11 or newer is required.")
     root=Path(os.environ.get("XDG_DATA_HOME",Path.home()/".local/share"))/"SnoopyLinux";root.mkdir(parents=True,exist_ok=True)
     cache=Path(os.environ.get("XDG_CACHE_HOME",Path.home()/".cache"))/"SnoopyLinuxInstaller";cache.mkdir(parents=True,exist_ok=True)
-    if shutil.disk_usage(root).free<5*1024**3:raise SystemExit("Free at least 5 GB of space before installing Snoopy's animation library.")
-    print("Installing Snoopy for "+platform.machine()+". The animation download is about 2 GB.",flush=True)
+    if shutil.disk_usage(root).free<8*1024**3:raise SystemExit("Free at least 8 GB of space before installing Snoopy's animation library.")
+    print("Installing Snoopy for "+platform.machine()+". The animation download is about 4.2 GB (base library plus the new idle scenes).",flush=True)
     subprocess.run(["sudo","apt-get","update"],check=True)
     subprocess.run(["sudo","apt-get","install","-y","curl","ca-certificates"],check=True)
     app=download(APP_NAME,APP_SHA,cache);archive=download(MEDIA_NAME,MEDIA_SHA,cache)
     # Extract and verify all media before changing the application or its preferences.
     media=extract_media(archive,root)
+    archive.unlink()  # Verified base media is installed; free cache space before the idle upgrade.
+    prepare_idle_from_deb(app,media,cache)
     # /tmp copy is readable by apt's download sandbox even with a private home directory.
     with tempfile.TemporaryDirectory(prefix="snoopy-deb-") as temp:
         os.chmod(temp,0o755);package=Path(temp)/APP_NAME;shutil.copyfile(app,package);os.chmod(package,0o644)
         subprocess.run(["sudo","apt-get","install","-y",str(package)],check=True)
     configure(media)
-    archive.unlink()  # The verified extracted library is now installed; save 2 GB of cache space.
     print("Snoopy installed. Open Snoopy from the applications menu, or type: snoopy-linux",flush=True)
     print("Animations are configured automatically. Automatic idle startup is optional in Settings. Your screen lock is unchanged.",flush=True)
-    print("Linux 1.0.1 is an initial test build; try Preview on this desktop first.",flush=True)
+    print("Try Preview on this desktop first; automatic idle support depends on the desktop.",flush=True)
 
 if __name__=="__main__":
     try:main()

@@ -28,7 +28,9 @@ class Renderer:
 
     def begin(self, selection):
         palette = selection["palette"]
-        background = self.color(palette["Background"]) if palette else QColor(55,143,123)
+        tags=selection.get('tags',set())
+        fallback=QColor(25,65,69) if 'timeOfDay:lateNight' in tags else QColor(42,108,99) if 'timeOfDay:evening' in tags else QColor(55,143,123)
+        background = self.color(palette["Background"]) if palette else fallback
         overlay = self.color(palette["Overlay"]) if palette else QColor(128,187,159,36)
         result = QImage(1920,1080,QImage.Format.Format_ARGB32_Premultiplied); result.fill(background)
         tint = QImage(1920,1080,result.format()); tint.fill(overlay)
@@ -53,10 +55,27 @@ class Renderer:
                 y = layer["Y"] + (house["OffsetY"] if offset else 0)
                 painter.drawImage(QRectF(x,y,layer["Width"],layer["Height"]),self.image(file))
                 painter.restore()
+        def segment(s,plane=None):
+            elapsed=max(0,seconds-s['Start'])
+            for layer in s['Layers']:
+                if plane and layer['Plane']!=plane:continue
+                frame=int(elapsed*layer['Fps'])
+                frame=frame%len(layer['Files']) if layer['Loop'] else min(frame,len(layer['Files'])-1)
+                x,y,w,h=layer['X'],layer['Y'],layer['Width'],layer['Height']
+                if not s['Asset'].get('IgnoreOffset',False):x+=house['OffsetX'];y+=house['OffsetY']
+                if 'Rects' in layer:
+                    r=layer['Rects'][frame];x+=r[0];y+=r[1];w,h=r[2:]
+                painter.drawImage(QRectF(x,y,w,h),self.image(layer['Files'][frame]))
         try:
             behind = effect and effect["Layers"][0]["Plane"]=="backgroundEffect"
             if behind: draw(effect)
-            draw(house,True); draw(selection["pose"],True)
+            program=selection.get('program')
+            character,visitors=program.at(seconds) if program else (None,[])
+            for visitor in visitors:segment(visitor,'backgroundVisitor')
+            draw(house,True)
+            if character:segment(character)
+            else:draw(selection['pose'],True)
+            for visitor in visitors:segment(visitor,'foregroundVisitor')
             if not behind: draw(effect)
         finally: painter.end()
         return result

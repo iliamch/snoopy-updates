@@ -6,6 +6,8 @@ import re
 import shutil
 import tarfile
 import tempfile
+import subprocess
+import sys
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen, build_opener, HTTPRedirectHandler
@@ -89,6 +91,10 @@ def install(offer):
     with tempfile.TemporaryDirectory(prefix="update-",dir=root) as temp:
         temp=Path(temp);archive=temp/"download.tar.gz";download(offer,archive)
         ready=temp/"ready";extract(archive,ready,offer["version"])
+        # Execute the verified candidate media migrator before selecting the new version.
+        from .core import load_settings
+        media=load_settings()["MediaPath"]
+        subprocess.run([sys.executable,"-c","from snoopy.media_update import ensure; import sys; ensure(sys.argv[1])",media],cwd=ready,check=True)
         versions=root/"versions";versions.mkdir(exist_ok=True)
         target=versions/offer["version"]
         if target.exists():

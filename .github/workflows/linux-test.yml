@@ -32,7 +32,10 @@ jobs:
         working-directory: linux
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Native cloudy playback
-        run: snoopy-linux --smoke 8 --doghouse --weather cloudy --report cloud-test.json
+        run: snoopy-linux --smoke 90 --doghouse --weather cloudy --report cloud-test.json
+      - name: Verify new interaction library and playback
+        run: |
+          /usr/bin/python3 -c 'import json,os; from pathlib import Path; p=Path(os.environ["XDG_DATA_HOME"])/"SnoopyLinux/Media-1/IdleAssets/interactions.json"; assert len(json.loads(p.read_text())["Assets"])==119; r=json.loads(Path("cloud-test.json").read_text()); assert r["action_frames"]+r["visitor_frames"]>0, r'
       - name: Native movie playback
         run: snoopy-linux --smoke 8 --report movie-test.json
       - name: Native doghouse to movie to doghouse transition
