@@ -40,7 +40,11 @@ class Program:
         weather=set(selection['effect']['Rules'])&set(tags) if selection['effect'] else set()
         weather={t for t in weather if t.startswith('weather:')}
         exclusions=catalog['Houses'].get(house,{})
-        eligible=[a for a in assets if allowed(a,house,set(tags),weather,exclusions)]
+        # This reconstructed cycle includes AP021's arrival; inherit its original restrictions.
+        dependencies={'Cycle_104_RWH004':'103_AP021'}
+        by_id={a['Id']:a for a in assets}
+        eligible=[a for a in assets if allowed(a,house,set(tags),weather,exclusions) and
+                  (a['Id'] not in dependencies or allowed(by_id[dependencies[a['Id']]],house,set(tags),weather,exclusions))]
         actions=[a for a in eligible if a['Kind'] in ('characterAdditionalPose','characterMoment')]
         transitions={(a['Start'],a['End']):a for a in assets if a['Kind']=='characterPoseTransition'}
         poses={p['Id']:p for p in selection['poses']}
@@ -93,3 +97,4 @@ class Program:
         character=next((s for s in self.character if s['Start']<=seconds<s['Start']+s['Duration']),self.character[-1])
         visitors=[s for s in self.visitors if s['Start']<=seconds<s['Start']+s['Duration']]
         return character,visitors
+

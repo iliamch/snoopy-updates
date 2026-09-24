@@ -56,4 +56,12 @@ class InteractionTests(unittest.TestCase):
             self.assertTrue(all(s['Pose'] for s in overlaps))
         self.assertEqual(p.character[-1]['Asset']['Id'],'a')
 
+    def test_companion_cycle_inherits_wind_exclusion(self):
+        source=asset('103_AP021',end='a');source['Excluded']=['weather:windy']
+        cycle=asset('Cycle_104_RWH004',end='a')
+        selection=self.selection();selection['effect']={'Rules':['weather:windy']}
+        p=Program(dict(Assets=[source,cycle],Houses={}),selection,{'weather:windy'},120,random.Random(2))
+        self.assertFalse(p.events)
+
 if __name__=='__main__':unittest.main()
+

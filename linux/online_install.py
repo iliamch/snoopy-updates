@@ -18,7 +18,7 @@ from pathlib import Path, PurePosixPath
 RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24/"
 BASE_RELEASE = "https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.20.2/"
 APP_NAME = "snoopy-linux_1.1.0_all.deb"
-APP_SHA = "343c5fde02eb1c62a0c246118a7c9a2ef84eac0466d71f9e7c1dee27aa1e80a2"
+APP_SHA = "c149a46b50429512f9baf3c02b0031e12b89a22df9d9c150d723f833889242ba"
 MEDIA_NAME = "SnoopyLinux-Media-1.zip"
 MEDIA_SHA = "40f1c7c6d6ed61ed72afa934f85530a0605ecf605f8d9ceb594953caee5fa33f"
 
@@ -125,3 +125,4 @@ def main():
 if __name__=="__main__":
     try:main()
     except (OSError,ValueError,RuntimeError,subprocess.CalledProcessError) as error:raise SystemExit("Installation stopped: "+str(error))
+
