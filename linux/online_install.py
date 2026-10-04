@@ -22,6 +22,19 @@ APP_SHA = "4be5b9c82cc4e65cf0247c876a1de1b20567d0d47faa2c32fdef44614d695b27"
 MEDIA_NAME = "SnoopyLinux-Media-1.zip"
 MEDIA_SHA = "40f1c7c6d6ed61ed72afa934f85530a0605ecf605f8d9ceb594953caee5fa33f"
 
+def supported_release(release):
+    """Accept native supported releases or Mint 22.x with a verified Noble base."""
+    version_text=release.get("VERSION_ID","")
+    if not isinstance(version_text,str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)*",version_text):return False
+    version=tuple(int(part) for part in version_text.split("."))
+    distro=release.get("ID")
+    if distro=="ubuntu":return version>=(24,4)
+    if distro=="debian":return version>=(12,)
+    ancestry=release.get("ID_LIKE","")
+    return (distro=="linuxmint" and version[0]==22
+            and isinstance(ancestry,str) and "ubuntu" in ancestry.split()
+            and release.get("UBUNTU_CODENAME")=="noble")
+
 def digest(path):
     with Path(path).open("rb") as stream:return hashlib.file_digest(stream,"sha256").hexdigest()
 
@@ -99,8 +112,7 @@ def main():
     if sys.platform!="linux":raise SystemExit("Run this installer on Ubuntu or Debian Linux.")
     if os.geteuid()==0:raise SystemExit("Run this command as your normal user, without sudo. It will ask for sudo only when needed.")
     if platform.machine() not in ("x86_64","aarch64","arm64"):raise SystemExit("Supported processors: Intel/AMD 64-bit and ARM64.")
-    release=platform.freedesktop_os_release();distro=release.get("ID");release_version=tuple(int(p) for p in release.get("VERSION_ID","0").split(".") if p.isdigit())
-    if not ((distro=="ubuntu" and release_version>=(24,4)) or (distro=="debian" and release_version>=(12,))):raise SystemExit("This package requires Ubuntu 24.04+ or Debian 12+.")
+    if not supported_release(platform.freedesktop_os_release()):raise SystemExit("This package requires Ubuntu 24.04+, Debian 12+, or Linux Mint 22.x with the Ubuntu noble base.")
     if sys.version_info<(3,11):raise SystemExit("Python 3.11 or newer is required.")
     root=Path(os.environ.get("XDG_DATA_HOME",Path.home()/".local/share"))/"SnoopyLinux";root.mkdir(parents=True,exist_ok=True)
     cache=Path(os.environ.get("XDG_CACHE_HOME",Path.home()/".cache"))/"SnoopyLinuxInstaller";cache.mkdir(parents=True,exist_ok=True)

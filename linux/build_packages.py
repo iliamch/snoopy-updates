@@ -37,6 +37,8 @@ def ar_write(path,files):
 
 def build(out):
     out.mkdir(parents=True,exist_ok=True)
+    # Keep the standalone download and the source installer byte-for-byte identical.
+    (out/"SnoopyUbuntuInstall.py").write_bytes((ROOT/"online_install.py").read_bytes())
     app=[("main.py",(ROOT/"main.py").read_bytes(),0o644)]
     app += [(f.relative_to(ROOT).as_posix(),f.read_bytes(),0o644) for f in sorted((ROOT/"snoopy").glob("*.py"))]
     manifest=dict(Edition="SnoopyLinux",Version=VERSION,Files={name:hashlib.sha256(payload).hexdigest() for name,payload,_ in app})

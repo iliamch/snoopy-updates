@@ -25,13 +25,13 @@ Publish the edition's generated update and UpdaterSetup ZIPs to a stable release
 
 ## Ubuntu and Debian Linux
 
-Snoopy Linux **1.1.1** supports doghouse interactions for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The same installer supports both processors.
+Snoopy Linux **1.1.1** supports doghouse interactions for Ubuntu 24.04+ / Debian 12+, on Intel/AMD 64-bit and ARM64. The repository installer also recognizes Ubuntu-based Linux Mint 22.x (Noble). The same installer supports both processors.
 
 Run as your normal desktop user:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl
-curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24.1/SnoopyUbuntuInstall.py -o SnoopyUbuntuInstall.py && python3 SnoopyUbuntuInstall.py
+curl -fL https://raw.githubusercontent.com/iliamch/snoopy-updates/main/linux/online_install.py -o SnoopyUbuntuInstall.py && python3 SnoopyUbuntuInstall.py
 ```
 
 The installer downloads about 4.2 GB, verifies the application and media, installs native dependencies, adds the Snoopy menu entry and configures the animation folder automatically. Allow 8 GB free during installation. Open `snoopy-linux` afterward. Automatic idle startup is optional in Settings; the desktop lock stays unchanged. See [Linux instructions and desktop compatibility](linux/README.md).
@@ -44,4 +44,4 @@ The cloud fix skips damaged opening frames and fades in clean cloud artwork on b
 
 Linux 1.0.1 users should reopen Settings after updating; the new media library downloads automatically there. Future updates prepare media before selecting the new application version.
 
-Linux 1.1.1 fixes the media-manifest checksum pin in the initial 1.1.0 installer. Use the current release installer. The validated media itself is unchanged.
+Linux 1.1.1 fixes the media-manifest checksum pin in the initial 1.1.0 installer. Use the repository installer above for Mint support; the older release installer does not recognize Mint. The validated media itself is unchanged.

@@ -1,6 +1,6 @@
 # Snoopy for Ubuntu and Debian — 1.1.1
 
-For Ubuntu 24.04 or newer and Debian 12 or newer, with Python 3.11+ and Qt 6.4+.
+For Ubuntu 24.04 or newer, Debian 12 or newer, and Ubuntu-based Linux Mint 22.x (Noble), with Python 3.11+ and Qt 6.4+.
 The same **all** package runs on Intel/AMD 64-bit and ARM64. Native Qt and video libraries are installed from your distribution for your processor. No Windows emulator is used.
 
 ## Automatic Ubuntu/Debian install
@@ -9,7 +9,7 @@ Run these commands as your normal desktop user (the installer requests sudo for 
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl
-curl -fL https://github.com/iliamch/snoopy-updates/releases/download/v2026.09.24.1/SnoopyUbuntuInstall.py -o SnoopyUbuntuInstall.py && python3 SnoopyUbuntuInstall.py
+curl -fL https://raw.githubusercontent.com/iliamch/snoopy-updates/main/linux/online_install.py -o SnoopyUbuntuInstall.py && python3 SnoopyUbuntuInstall.py
 ```
 
 This downloads about 4.2 GB of animations, verifies SHA-256 checksums and each extracted media file, installs the correct native dependencies, and configures the media folder automatically. Allow at least 8 GB free during installation. It creates the Snoopy applications-menu entry; run `snoopy-linux` to open settings. Automatic idle playback remains an optional setting. It preserves other Snoopy preferences and the desktop lock configuration.
@@ -49,7 +49,7 @@ Preferences live in `~/.config/snoopy`; user updates in `~/.local/share/SnoopyLi
 
 Run `python3 -m unittest discover -s tests -v`. With the media folder available: `python3 main.py --smoke 8 --doghouse --weather cloudy --media /path/to/Media --report cloud-test.json` and `python3 main.py --smoke 8 --media /path/to/Media --report movie-test.json`.
 
-`build_packages.py` creates the portable installer, architecture-independent .deb, and source-only updater tarball. The .deb declares native dependencies. No personal preferences or account credentials are packaged. The media bundle is produced separately from the existing local assets.
+`build_packages.py` creates the portable installer, architecture-independent .deb, source-only updater tarball, and standalone `SnoopyUbuntuInstall.py` directly from `online_install.py`. The .deb declares native dependencies. No personal preferences or account credentials are packaged. The media bundle is produced separately from the existing local assets.
 
 References: [Ubuntu Qt Multimedia package](https://packages.ubuntu.com/noble/python3-pyqt6.qtmultimedia), [Debian Qt Multimedia package](https://packages.debian.org/bookworm/python3-pyqt6.qtmultimedia), [Qt video-frame API](https://doc.qt.io/qt-6/qvideoframe.html).
 
